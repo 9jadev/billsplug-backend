@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ContactFormMail;
 use App\Models\Airtime;
 use App\Models\Customer;
 use App\Models\MonifyTransaction;
@@ -12,6 +13,8 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Services\MonifyService;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\Mail;
+
 class CustomerController extends Controller
 {
     /**
@@ -81,6 +84,28 @@ class CustomerController extends Controller
             "message" => "Customer created successful.",
             'token' => $customer->createToken('webapp', ['role:customer'])->plainTextToken,
         ]);
+    }
+
+    public function contactForm(Request $request) {
+        $request->validate([
+            "name" => "required|string",
+            "phone" => "required",
+            "email" => "required|string",
+            "message" => "required|string"
+        ]);
+        try {
+            // Mail()
+            $data = [
+                "name" => $request->name,
+                "phone" => $request->phone,
+                "email" => $request->email,
+                "message" => $request->message
+            ];
+            Mail::to($request->email)->send(new ContactFormMail($data));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        return response()->json(["message" => "Successfully"], 200);
     }
 
     public function verifyPayment(Request $request, MonifyService $monifyService) {
