@@ -103,7 +103,7 @@ class CustomerController extends Controller
             ];
             Mail::to($request->email)->send(new ContactFormMail($data));
         } catch (\Throwable $th) {
-            //throw $th;
+            throw $th;
         }
         return response()->json(["message" => "Successfully"], 200);
     }
