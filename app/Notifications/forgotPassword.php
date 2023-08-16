@@ -36,7 +36,7 @@ class forgotPassword extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('Dear '+$notifiable->name)
+                    ->line('Dear '.$notifiable->name)
                     ->line('You have successfully changed your password to '.$this->password);
     }
 
