@@ -91,19 +91,24 @@ class AirtimeController extends Controller
         if ($request->amount > auth()->user()->balance) {
             return response()->json(["message" => "Low Balance."], 400);
         }
-        auth()->user()->withdraw($request->amount, [
-            "request_id" => $requestId,
-            "type" => $request->serialId,
-            "description" => "Purchase of ".strtoupper($request->serialId). " AIRTIME"]
-        );
+
         $buyAirtime = $airtimeService->buyAirtime($requestId, $request->serialId,$request->amount, $request->phone);
         if ($buyAirtime == null) {
-            auth()->user()->deposit($request->amount);
+            // auth()->user()->deposit($request->amount);
             return response()->json([
                 "message" => "error happend",
                 "status" => "error"
             ], 400);
         }
+        $airtime = Airtime::create([
+            "customer_id" => auth()->user()->id,
+            "amount" => $request->amount,
+            "request_id" => $requestId,
+            "phone" => $request->phone,
+            "provider" => $request->serialId,
+            "response" =>  json_encode($buyAirtime)
+        ]);
+
         // if ($buyAirtime["content"]["transactions"]["status"] != "delivered") {
         //     auth()->user()->deposit($request->amount);
         //     return response()->json([
@@ -118,14 +123,14 @@ class AirtimeController extends Controller
                 "status" => "error"
             ], 400);
         }
-        $airtime = Airtime::create([
-            "customer_id" => auth()->user()->id,
-            "amount" => $request->amount,
-            "request_id" => $requestId,
-            "phone" => $request->phone,
-            "provider" => $request->serialId,
-            "response" =>  json_encode($buyAirtime)
-        ]);
+        $billablecodes = ["000","099","001","044"];
+        if (in_array($buyAirtime["code"], $billablecodes)) {
+            auth()->user()->withdraw($request->amount, [
+                "request_id" => $requestId,
+                "type" => $request->serialId,
+                "description" => "Purchase of ".strtoupper($request->serialId). " AIRTIME"]
+            );
+        }
 
         return response()->json([
             "message" => $buyAirtime["response_description"],

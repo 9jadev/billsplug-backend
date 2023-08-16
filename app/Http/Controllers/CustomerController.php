@@ -90,7 +90,7 @@ class CustomerController extends Controller
 
     public function forgotPassword(Request $request) {
         $request->validate([
-            "email" => "required|email",
+            "email" => "required|email|exists:customers,email",
         ]);
         $rand = Str::upper(Str::random(3)).rand(100000,999999);
         $customer = Customer::where("email", $request->email)->first();

@@ -45,24 +45,13 @@ class DataPurchaseController extends Controller
             return response()->json(["message" => "Low Balance."], 400);
         }
         $requestId = $this->requestId();
-        auth()->user()->withdraw((int) $request->amount,[
-            "request_id" => $requestId,
-            "type" => $request->serialId,
-            "description" => "Purchase of ".strtoupper($request->serviceID). " DATA"]);
+
 
         $buyAirtime = $dataService->buyData($requestId, $request->serviceID,$request->amount, $request->phone,1,$request->variation_code);
         if ($buyAirtime == null) {
-            auth()->user()->deposit($request->amount);
-            return response()->json([
-                "message" => "error happend",
-                "status" => "error"
-            ], 400);
-        }
-        // return $buyAirtime;
-        if ($buyAirtime["code"] != "000") {
             // auth()->user()->deposit($request->amount);
             return response()->json([
-                "message" => $buyAirtime["response_description"],
+                "message" => "error happend",
                 "status" => "error"
             ], 400);
         }
@@ -75,6 +64,23 @@ class DataPurchaseController extends Controller
             "response" => json_encode($buyAirtime),
             "customer_id" => auth()->user()->id,
         ]);
+
+        // return $buyAirtime;
+        if ($buyAirtime["code"] != "000") {
+            // auth()->user()->deposit($request->amount);
+            return response()->json([
+                "message" => $buyAirtime["response_description"],
+                "status" => "error"
+            ], 400);
+        }
+
+        $billablecodes = ["000","099","001","044"];
+        if (in_array($buyAirtime["code"], $billablecodes)) {
+            auth()->user()->withdraw((int) $request->amount,[
+                "request_id" => $requestId,
+                "type" => $request->serialId,
+                "description" => "Purchase of ".strtoupper($request->serviceID). " DATA"]);
+        }
 
         return response()->json([
             "message" => $buyAirtime["response_description"],
