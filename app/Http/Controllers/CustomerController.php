@@ -8,11 +8,13 @@ use App\Models\Customer;
 use App\Models\MonifyTransaction;
 use App\Services\AirtimeService;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use App\Services\MonifyService;
 use App\Models\Transaction;
+use App\Notifications\forgotPassword;
 use Illuminate\Support\Facades\Mail;
 
 class CustomerController extends Controller
@@ -86,11 +88,26 @@ class CustomerController extends Controller
         ]);
     }
 
+    public function forgotPassword(Request $request) {
+        $request->validate([
+            "email" => "required|email",
+        ]);
+        $rand = Str::upper(Str::random(3)).rand(100000,999999);
+        $customer = Customer::where("email", $request->email)->first();
+        $customer->update([
+            // "password" => bcrypt($request->rand),
+        ]);
+
+        $customer->notify(new forgotPassword($rand));
+        // Notification::send($customer, new forgotPassword($rand));
+        return response()->json(["message" => "Your new password has been sent to your mail."], 200);
+    }
+
     public function contactForm(Request $request) {
         $request->validate([
             "name" => "required|string",
             "phone" => "required",
-            "email" => "required|string",
+            "email" => "required|email",
             "message" => "required|string"
         ]);
         try {
