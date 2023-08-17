@@ -86,4 +86,18 @@ class AirtimeService
         logs()->info($response);
         return $response->json();
     }
+
+    public static function reQueryTranx($tranx) {
+        logs()->info(env('SANDBOX_URL').'requery');
+        $data = [
+            "request_id" => $tranx,
+        ];
+        logs()->info($data);
+        $response = Http::withHeaders([
+            'api-key' => env('APIKEY'),
+            'public-key' => env('PUBLICKEY')
+        ])->post(env('SANDBOX_URL').'requery', $data);
+        logs()->info($response);
+        return $response->json();
+    }
 }

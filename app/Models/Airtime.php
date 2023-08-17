@@ -11,10 +11,16 @@ class Airtime extends Model
     protected $table = "airtimes";
     protected $guarded = [];
     protected $hidden = [];
+    protected $appends = ['serialref'];
 
 
     public function getResponseAttribute($value)
     {
         return json_decode($value);
+    }
+
+    public function getSerialrefAttribute()
+    {
+        return "airtime-".$this->provider."-".$this->request_id;
     }
 }

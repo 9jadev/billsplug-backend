@@ -29,6 +29,15 @@ class CustomerController extends Controller
         return response()->json(["message" => "successful", "data" => $data], 200);
     }
 
+    public function runRequery($id, AirtimeService $airtimeService) {
+        $requery = $airtimeService->reQueryTranx($id);
+        return $requery;
+        if ($requery == null) {
+            return response()->json(["message" => "Error", "data" => $requery], 400);
+        }
+        return response()->json(["message" => $requery["response_description"], "data" => $requery], 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -46,7 +55,7 @@ class CustomerController extends Controller
         if ($monifyToken == null) {
             return response()->json(["message" => "Bank error occured."], 400);
         }
-        $monifyResolve = $monifyService->resolveBankAccount(env('APP_NAME').$request->APP_NAME, $request->email, $request->name, $monifyToken["responseBody"]["accessToken"]);
+        $monifyResolve = $monifyService->resolveBankAccount(env('APP_NAME')." / ".$request->name, $request->email, $request->name, $monifyToken["responseBody"]["accessToken"]);
         if ($monifyResolve == null) {
             return response()->json(["message" => "Bank resolution error occured."], 400);
         }

@@ -33,6 +33,7 @@ Route::prefix('v1')->group(function () {
         Route::post('forgotpassword', [CustomerController::class, 'forgotPassword']);
         Route::prefix('transactions')->group(function () {
             Route::get('list', [CustomerController::class, 'listTransactions'])->middleware(['auth:sanctum', 'type.customer']);
+            Route::get('requery/{id}', [CustomerController::class, 'runRequery'])->middleware(['auth:sanctum', 'type.customer']);
         });
         Route::prefix('airtime')->group(function () {
             Route::get('', [AirtimeController::class, 'index'])->middleware(['auth:sanctum', 'type.customer']);
