@@ -46,7 +46,6 @@ class DataPurchaseController extends Controller
         }
         $requestId = $this->requestId();
 
-
         $buyAirtime = $dataService->buyData($requestId, $request->serviceID,$request->amount, $request->phone,1,$request->variation_code);
         if ($buyAirtime == null) {
             // auth()->user()->deposit($request->amount);

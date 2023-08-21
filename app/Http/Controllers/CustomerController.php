@@ -104,12 +104,31 @@ class CustomerController extends Controller
         $rand = Str::upper(Str::random(3)).rand(100000,999999);
         $customer = Customer::where("email", $request->email)->first();
         $customer->update([
-            // "password" => bcrypt($request->rand),
+            "password" => bcrypt($request->rand),
         ]);
 
         $customer->notify(new forgotPassword($rand));
         // Notification::send($customer, new forgotPassword($rand));
         return response()->json(["message" => "Your new password has been sent to your mail."], 200);
+    }
+
+    public function changePassword(Request $request) {
+        $request->validate([
+            "oldpassword" => "required|string",
+            "password" => "required|string|confirmed"
+        ]);
+
+        $customer = auth()->user();
+
+        if (!$customer || !Hash::check($request->oldpassword, $customer->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
+        $customer->update([
+            "password" => bcrypt($request->password),
+        ]);
+        return response()->json(["message" => "Your password has been updated successfully."], 200);
     }
 
     public function contactForm(Request $request) {
