@@ -11,4 +11,9 @@ class ElectricityPurchase extends Model
 
     protected $table = "electricity_purchases";
     protected $guarded = [];
+
+    public function getResponseAttribute($value)
+    {
+        return json_decode($value);
+    }
 }

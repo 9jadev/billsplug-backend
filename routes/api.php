@@ -61,6 +61,7 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('electricity')->group(function () {
             Route::get('', [ElectricityPurchaseController::class, 'index'])->middleware(['auth:sanctum', 'type.customer']);
+            Route::post('search', [ElectricityPurchaseController::class, 'searchElectricity'])->middleware(['auth:sanctum', 'type.customer']);
             Route::post('buy', [ElectricityPurchaseController::class, 'create'])->middleware(['auth:sanctum', 'type.customer']);
         });
 
