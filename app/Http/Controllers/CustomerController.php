@@ -84,11 +84,11 @@ class CustomerController extends Controller
         ]);
         $customer = Customer::where("email", $request->email)->first();
 
-        // if (!$customer || !Hash::check($request->password, $customer->password)) {
-        //     throw ValidationException::withMessages([
-        //         'email' => ['The provided credentials are incorrect.'],
-        //     ]);
-        // }
+        if (!$customer || !Hash::check($request->password, $customer->password)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
+        }
 
         return response()->json([
             'customer' => $customer,
