@@ -107,7 +107,7 @@ class CustomerController extends Controller
         $rand = Str::upper(Str::random(3)).rand(100000,999999);
         $customer = Customer::where("email", $request->email)->first();
         $customer->update([
-            "password" => bcrypt($request->rand),
+            "password" => bcrypt($rand),
         ]);
 
         $customer->notify(new forgotPassword($rand));
