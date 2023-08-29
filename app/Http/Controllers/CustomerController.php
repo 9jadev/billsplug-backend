@@ -86,7 +86,7 @@ class CustomerController extends Controller
 
         if (!$customer || !Hash::check($request->password, $customer->password)) {
             throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
+                'email' => ['The provided credentials are incorrect. domv'],
             ]);
         }
 
